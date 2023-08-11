@@ -4,13 +4,24 @@ export default class Slider {
     this.slides = this.page.children
     this.btns = document.querySelectorAll(btns)
     this.slideIndex = 1
+    this.hanson = document.querySelector(".hanson")
   }
-
+  
   showSlides(n) {
     if(n > this.slides.length){
       this.slideIndex = 1
     }else if(n < 1){
       this.slideIndex = this.slides.length;
+    }
+    this.hanson.style.display = "none";
+    if(this.slideIndex == 3){
+      setTimeout(() => {
+        this.hanson.classList.add('animated' , 'slideInUp')
+        this.hanson.style.display = 'block'
+        this.hanson.style.zIndex = "4";
+      }, 3000);
+    }else{
+       this.hanson.classList.remove("slideInUp");
     }
 
     [...this.slides].forEach(slide => {
