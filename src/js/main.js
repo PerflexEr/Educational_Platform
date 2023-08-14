@@ -20,6 +20,7 @@ window.addEventListener('DOMContentLoaded' , () => {
     prev: ".modules__info-btns .slick-prev",
     next: ".modules__info-btns .slick-next",
     activeClass: "card-active",
+    autoplay: true
   });
   miniSlider2.init();
 
