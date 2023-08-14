@@ -1,9 +1,8 @@
 import Slider from "./slider";
 
 export default class MainSlider extends Slider {
-  constructor(container, btns) {
-    super(container, btns);
-    this.btns = btns;
+  constructor( btns) {
+    super(btns);
   }
   showSlides(n) {
     if (n > this.slides.length) {
