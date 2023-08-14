@@ -1,7 +1,7 @@
 import Slider from "./slider";
 
 export default class MainSlider extends Slider {
-  constructor( btns) {
+  constructor(btns) {
     super(btns);
   }
   showSlides(n) {
@@ -10,6 +10,7 @@ export default class MainSlider extends Slider {
     } else if (n < 1) {
       this.slideIndex = this.slides.length;
     }
+    this.hanson = document.querySelector(".hanson");
     this.hanson.style.display = "none";
     if (this.slideIndex == 3) {
       setTimeout(() => {
@@ -25,7 +26,7 @@ export default class MainSlider extends Slider {
       slide.style.display = "none";
     });
 
-    this.slides[this.slideIndex - 1].style.display = "block";
+    [...this.slides][this.slideIndex - 1].style.display = "block";
   }
 
   plusSlide(n) {
@@ -34,7 +35,6 @@ export default class MainSlider extends Slider {
 
   render() {
     this.btns.forEach((item) => {
-      console.log(item); // Добавьте эту строку для проверки
       item.addEventListener("click", () => {
         this.plusSlide(1);
       });
