@@ -62,6 +62,7 @@ __webpack_require__.r(__webpack_exports__);
 class Forms {
   constructor(forms) {
     this.forms = document.querySelectorAll(forms);
+    this.inputs = document.querySelectorAll("input");
     this.message = {
       loading: "loading...",
       success: "thnk u : )",
@@ -71,30 +72,92 @@ class Forms {
   }
   async postData(url, data) {
     let res = await fetch(url, {
-      method: "Post",
+      method: "POST",
       body: data
     });
     console.log("Получен ответ от сервера:", res);
     return await res.text();
   }
+  initMask() {
+    let setCursorPosition = (element, position) => {
+      element.focus();
+      if (element.setSelectionRange) {
+        element.setSelectionRange(position, position);
+      } else if (element.createTextRange) {
+        let range = element.createTextRange();
+        range.collapse(true);
+        range.moveEnd("character", position);
+        range.moveStart("character", position);
+        range.select();
+      }
+    };
+    function createMask(event) {
+      let matrix = "+1 (___) ___-____",
+        iterator = 0,
+        def = matrix.replace(/\D/g, ""),
+        value = this.value.replace(/\D/g, "");
+      if (def.length >= value.length) {
+        value = def;
+      }
+      this.value = matrix.replace(/./g, a => {
+        return /[_\d]/.test(a) && iterator < value.length ? value.charAt(iterator++) : iterator >= value.length ? "" : a;
+      });
+      if (event.type === "blur") {
+        if (this.value.length === 2) {
+          this.value = "";
+        }
+      } else {
+        setCursorPosition(this, this.value.length);
+      }
+    }
+    let inputs = document.querySelectorAll('[name = "phone"]');
+    inputs.forEach(input => {
+      input.addEventListener("input", createMask);
+      input.addEventListener("focus", createMask);
+      input.addEventListener("blur", createMask);
+    });
+  }
+  clearInuts() {
+    this.inputs.forEach(input => {
+      input.value = "";
+    });
+  }
+  checkMailInputs() {
+    const txtInputs = document.querySelectorAll('[type = "email"]');
+    txtInputs.forEach(input => {
+      input.addEventListener("input", e => {
+        const inputValue = e.target.value;
+        if (!inputValue.match(/^[а-яё0-9\s]+$/i)) {
+          e.target.value = inputValue.replace(/[^a-z 0-9 @ \.]/gi, "");
+        }
+      });
+    });
+  }
   init() {
+    this.initMask();
+    this.checkMailInputs();
     this.forms.forEach(form => {
-      form.addEventListener('submit', e => {
+      form.addEventListener("submit", e => {
         e.preventDefault();
         let statusMessage = document.createElement("div");
         statusMessage.style.cssText = `
           margin-top: 15px;
-          font-szie: 18px;
+          font-size: 18px;
           color: grey;
         `;
-        item.appendChild(statusMessage);
+        form.appendChild(statusMessage);
         statusMessage.textContent = this.message.loading;
         const formData = new FormData(form);
-        this.postData(this.path, this.formData).then(res => {
+        this.postData(this.path, formData).then(res => {
           console.log(res);
           statusMessage.textContent = this.message.success;
         }).catch(() => {
           statusMessage.textContent = this.message.error;
+        }).finally(() => {
+          this.clearInuts();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 6000);
         });
       });
     });
@@ -182,43 +245,64 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   showSlides(n) {
     if (n > this.slides.length) {
       this.slideIndex = 1;
-    } else if (n < 1) {
+    }
+    if (n < 1) {
       this.slideIndex = this.slides.length;
     }
     try {
-      this.hanson = document.querySelector(".hanson");
-      this.hanson.style.display = "none";
-      if (this.slideIndex == 3) {
+      this.hanson.style.opacity = "0";
+      if (n == 3) {
+        this.hanson.classList.add("animated");
         setTimeout(() => {
-          this.hanson.classList.add("animated", "slideInUp");
-          this.hanson.style.display = "block";
-          this.hanson.style.zIndex = "4";
+          this.hanson.style.opacity = "1";
+          this.hanson.classList.add("slideInUp");
         }, 3000);
       } else {
         this.hanson.classList.remove("slideInUp");
       }
-    } catch (error) {}
+    } catch (e) {}
     [...this.slides].forEach(slide => {
       slide.style.display = "none";
     });
     [...this.slides][this.slideIndex - 1].style.display = "block";
   }
-  plusSlide(n) {
+  plusSlides(n) {
     this.showSlides(this.slideIndex += n);
   }
-  render() {
-    try {
-      this.btns.forEach(item => {
-        item.addEventListener("click", () => {
-          this.plusSlide(1);
-        });
-        item.parentNode.previousElementSibling.addEventListener("click", e => {
-          e.preventDefault();
-          this.slideIndex = 1;
-          this.showSlides(this.slideIndex);
-        });
+  bindTriggers() {
+    this.btns.forEach(item => {
+      item.addEventListener("click", () => {
+        this.plusSlides(1);
       });
-    } catch (error) {}
+      item.parentNode.previousElementSibling.addEventListener("click", e => {
+        e.preventDefault();
+        this.slideIndex = 1;
+        this.showSlides(this.slideIndex);
+      });
+    });
+    document.querySelectorAll(".prevmodule").forEach(item => {
+      item.addEventListener("click", e => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.plusSlides(-1);
+      });
+    });
+    document.querySelectorAll(".nextmodule").forEach(item => {
+      item.addEventListener("click", e => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.plusSlides(1);
+      });
+    });
+  }
+  render() {
+    if (this.container) {
+      try {
+        this.hanson = document.querySelector(".hanson");
+      } catch (e) {}
+      this.showSlides(this.slideIndex);
+      this.bindTriggers();
+    }
   }
 }
 
@@ -423,6 +507,11 @@ window.addEventListener('DOMContentLoaded', () => {
     container: ".page"
   });
   slider.render();
+  const moduleSlider = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__["default"]({
+    container: ".moduleapp",
+    btns: ".next"
+  });
+  moduleSlider.render();
   const miniSlider1 = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_2__["default"]({
     container: ".showup__content-slider",
     prev: ".showup__prev",
@@ -449,6 +538,7 @@ window.addEventListener('DOMContentLoaded', () => {
   new _modules_playVideo__WEBPACK_IMPORTED_MODULE_1__["default"](".showup .play", ".overlay").init();
   new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"](".officerold", ".officer__card-item").init();
   new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"](".officernew", ".officer__card-item").init();
+  new _modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"]('.form').init();
 });
 })();
 
