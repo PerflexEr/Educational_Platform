@@ -2,6 +2,44 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/js/modules/accordeon.js":
+/*!*************************************!*\
+  !*** ./src/js/modules/accordeon.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Accordeon)
+/* harmony export */ });
+class Accordeon {
+  constructor(triggersSelector, itemToShow) {
+    this.triggersSelector = document.querySelector(triggersSelector);
+    this.itemToShow = document.querySelector(itemToShow);
+    this.counter = 0;
+  }
+  init() {
+    this.triggersSelector.addEventListener('click', () => {
+      if (this.counter == 0) {
+        this.itemToShow.style.display = "block";
+        this.itemToShow.classList.add('animated', 'fadeIn');
+        this.counter++;
+      } else {
+        this.itemToShow.classList.remove("fadeIn");
+        this.itemToShow.classList.add("fadeOut");
+        setTimeout(() => {
+          this.itemToShow.style.display = "none";
+          this.itemToShow.classList.remove("fadeOut");
+        }, 200);
+        this.counter--;
+      }
+    });
+  }
+}
+;
+
+/***/ }),
+
 /***/ "./src/js/modules/difference.js":
 /*!**************************************!*\
   !*** ./src/js/modules/difference.js ***!
@@ -44,6 +82,42 @@ class Difference {
       this.hideItems();
       this.bindTriggers();
     } catch (error) {}
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/download.js":
+/*!************************************!*\
+  !*** ./src/js/modules/download.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Download)
+/* harmony export */ });
+class Download {
+  constructor(triggers) {
+    this.btns = document.querySelectorAll(triggers);
+    this.path = 'assets/img/mainbg.jpg';
+  }
+  downloadItem(path) {
+    const element = document.createElement('a');
+    element.setAttribute('href', path);
+    element.setAttribute("download", 'bgpicture');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+  init() {
+    this.btns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        this.downloadItem(this.path);
+      });
+    });
   }
 }
 
@@ -529,6 +603,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/slider/slider-mini */ "./src/js/modules/slider/slider-mini.js");
 /* harmony import */ var _modules_difference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/difference */ "./src/js/modules/difference.js");
 /* harmony import */ var _modules_forms__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/forms */ "./src/js/modules/forms.js");
+/* harmony import */ var _modules_accordeon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/accordeon */ "./src/js/modules/accordeon.js");
+/* harmony import */ var _modules_download__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modules/download */ "./src/js/modules/download.js");
+
+
 
 
 
@@ -573,6 +651,8 @@ window.addEventListener('DOMContentLoaded', () => {
   new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"](".officerold", ".officer__card-item").init();
   new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"](".officernew", ".officer__card-item").init();
   new _modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"]('.form').init();
+  new _modules_accordeon__WEBPACK_IMPORTED_MODULE_5__["default"](".module__info-show", ".msg").init();
+  new _modules_download__WEBPACK_IMPORTED_MODULE_6__["default"](".download").init();
 });
 })();
 
